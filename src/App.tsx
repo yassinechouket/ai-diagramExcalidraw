@@ -1,0 +1,171 @@
+import { useState, useCallback, useEffect, useRef } from "react";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import {
+  convertToExcalidrawElements,
+  CaptureUpdateAction,
+  newElementWith,
+} from "@excalidraw/excalidraw";
+import { useAgent } from "agents/react";
+import { useAgentChat } from "@cloudflare/ai-chat/react";
+import Canvas from "./components/Canvas";
+import ChatPanel from "./components/chat/ChatPanel";
+import { serializeCanvasState } from "./context/canvas-state";
+import "./App.css";
+
+// One agent instance per page load. The canvas state lives only in the
+// browser, so persisting chat history across refreshes would leave a dead
+// conversation referencing diagrams that no longer exist. Generated at the
+// module level so React StrictMode's double mount doesn't change it.
+const sessionId = crypto.randomUUID();
+
+export default function App() {
+  const [excalidrawAPI, setExcalidrawAPI] =
+    useState<ExcalidrawImperativeAPI | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Track which tool calls we've already applied so we don't double-apply
+  // when messages re-render.
+  const appliedToolCalls = useRef<Set<string>>(new Set());
+
+  // Hold the latest excalidrawAPI in a ref so the onToolCall callback (which
+  // is captured once at hook init time) can always read the live API instead
+  // of a stale closure copy.
+  const excalidrawAPIRef = useRef<ExcalidrawImperativeAPI | null>(null);
+  useEffect(() => {
+    excalidrawAPIRef.current = excalidrawAPI;
+  }, [excalidrawAPI]);
+
+  const handleApiReady = useCallback((api: ExcalidrawImperativeAPI) => {
+    setExcalidrawAPI(api);
+  }, []);
+
+  const agent = useAgent({ agent: "design-agent", name: sessionId });
+
+  // useAgentChat manages the chat protocol on top of the agent connection.
+  // We register an onToolCall handler to fulfill the queryCanvas client tool:
+  // when the agent calls queryCanvas, the worker streams the call here, we
+  // read the live scene, and submit the result back. The agent loop resumes
+  // automatically (autoContinueAfterToolResult is true by default).
+  const { messages, sendMessage, status } = useAgentChat({
+    agent,
+    onToolCall: async ({ toolCall, addToolOutput }) => {
+      if (toolCall.toolName !== "queryCanvas") return;
+      const api = excalidrawAPIRef.current;
+      const elements = api?.getSceneElements() ?? [];
+      addToolOutput({
+        toolCallId: toolCall.toolCallId,
+        output: { summary: serializeCanvasState(elements as unknown[]) },
+      });
+    },
+  });
+
+  // Watch messages for mutating server tools and apply them to the
+  // live canvas. The worker side just relays intent — actual scene mutation
+  // is the browser's job, since only the browser owns the Excalidraw store.
+  useEffect(() => {
+    if (!excalidrawAPI) return;
+
+    for (const message of messages) {
+      if (message.role !== "assistant") continue;
+      for (const part of message.parts ?? []) {
+        const type = (part as { type?: string }).type;
+        if (
+          type !== "tool-addElements" &&
+          type !== "tool-generateDiagram" &&
+          type !== "tool-updateElements" &&
+          type !== "tool-modifyDiagram" &&
+          type !== "tool-removeElements"
+        ) {
+          continue;
+        }
+        const p = part as {
+          type: string;
+          toolCallId: string;
+          state: string;
+          output: unknown;
+        };
+        if (p.state !== "output-available") continue;
+        if (appliedToolCalls.current.has(p.toolCallId)) continue;
+        appliedToolCalls.current.add(p.toolCallId);
+
+        if (p.type === "tool-addElements" || p.type === "tool-generateDiagram") {
+          const output = p.output as { elements?: unknown };
+          const skeletons = output?.elements;
+          if (Array.isArray(skeletons) && skeletons.length > 0) {
+            // Convert skeletons into full Excalidraw elements. regenerateIds
+            // false so the agent's chosen ids survive — otherwise later
+            // updateElements/removeElements calls (which use those ids) miss.
+            const newOnes = convertToExcalidrawElements(skeletons as never, {
+              regenerateIds: false,
+            });
+            const current = excalidrawAPI.getSceneElements();
+            const next = [...current, ...newOnes];
+            excalidrawAPI.updateScene({
+              elements: next,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            });
+            excalidrawAPI.scrollToContent(next, { fitToContent: true });
+          }
+        } else if (p.type === "tool-updateElements" || p.type === "tool-modifyDiagram") {
+          const output = p.output as {
+            updates?:
+              | { id: string; fields: Record<string, unknown> }[]
+              | Record<string, unknown>;
+            elementId?: string;
+          };
+
+          let updates: { id: string; fields: Record<string, unknown> }[] = [];
+          if (Array.isArray(output?.updates)) {
+            updates = output.updates;
+          } else if (
+            typeof output?.elementId === "string" &&
+            output?.updates &&
+            !Array.isArray(output.updates)
+          ) {
+            updates = [{ id: output.elementId, fields: output.updates }];
+          }
+
+          if (Array.isArray(updates) && updates.length > 0) {
+            const byId = new Map(updates.map((u) => [u.id, u.fields]));
+            const current = excalidrawAPI.getSceneElements();
+            const next = current.map((el) => {
+              const fields = byId.get(el.id);
+              return fields ? newElementWith(el, fields as never) : el;
+            });
+            excalidrawAPI.updateScene({
+              elements: next,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            });
+          }
+        } else if (p.type === "tool-removeElements") {
+          const output = p.output as { ids?: string[] };
+          const ids = new Set(output?.ids ?? []);
+          if (ids.size > 0) {
+            const current = excalidrawAPI.getSceneElements();
+            const next = current.filter((el) => !ids.has(el.id));
+            excalidrawAPI.updateScene({
+              elements: next,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            });
+          }
+        }
+      }
+    }
+  }, [messages, excalidrawAPI]);
+
+  return (
+    <div className={`app ${theme}`}>
+      <div className="canvas-container">
+        <Canvas onApiReady={handleApiReady} onThemeChange={setTheme} />
+      </div>
+      <ChatPanel
+        messages={messages}
+        sendMessage={sendMessage}
+        status={status}
+      />
+      <a href="#viewer" className="viewer-launch" title="Open diagram viewer for human scoring">
+        viewer
+      </a>
+    </div>
+  );
+}
