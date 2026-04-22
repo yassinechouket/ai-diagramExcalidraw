@@ -1,0 +1,186 @@
+[
+  {
+    "testCaseId": "create-simple-01",
+    "input": "Draw a single rectangle labeled Hello",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-simple-02",
+    "input": "Draw a circle and a square next to each other",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-simple-03",
+    "input": "Draw a simple flowchart with Start, Process, and End boxes connected by arrows",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-simple-04",
+    "input": "Draw a diamond labeled 'Decision' with two arrows coming out of it labeled 'Yes' and 'No'",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-simple-05",
+    "input": "Draw three rectangles in a vertical column labeled Top, Middle, Bottom",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-medium-01",
+    "input": "Draw a login flow: user enters credentials, system validates, if valid go to dashboard, if invalid show error",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-medium-02",
+    "input": "Draw an entity relationship diagram for a blog: Users have many Posts, Posts have many Comments",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-medium-03",
+    "input": "Draw a simple web architecture: Browser sends requests to a Load Balancer, which forwards to two Web Servers, which read from a Database",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-medium-04",
+    "input": "Draw a sequence diagram: Client calls Server, Server calls Database, Database returns data, Server returns response to Client",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-medium-05",
+    "input": "Draw a state machine for a traffic light with Red, Yellow, Green states transitioning in order",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-complex-01",
+    "input": "Draw an org chart for a company: CEO at top, 3 VPs reporting to CEO (Engineering, Sales, Marketing), each VP has 3 directors under them",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-complex-02",
+    "input": "Draw a microservices architecture: API Gateway receives requests, routes to Auth Service, User Service, Order Service, and Payment Service. Each service has its own database. Order Service also calls Payment Service.",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-complex-03",
+    "input": "Draw a complex e-commerce checkout flow with 8 steps: Cart Review, Shipping Address, Shipping Method, Payment, Order Review, Place Order, Confirmation, Email Receipt. Include error paths if payment fails.",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "create-complex-04",
+    "input": "Draw a network topology with 1 router connected to 2 switches, where each switch is connected to 4 computers and 1 printer. Show the router connecting to the internet.",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "modify-01",
+    "input": "make the login box red",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "modify-02",
+    "input": "now connect them with an arrow going from login to database",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "modify-03",
+    "input": "rename the Process box to Validate",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "modify-04",
+    "input": "add a Cache box between the API and the Database, and route the API through the cache",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "domain-01",
+    "input": "Draw the OAuth 2.0 authorization code flow",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "domain-02",
+    "input": "Draw the AWS three-tier web application architecture",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "domain-03",
+    "input": "Draw the relationship between a Kubernetes Pod, Service, and Deployment",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "edge-01",
+    "input": "draw something",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  },
+  {
+    "testCaseId": "edge-02",
+    "input": "Draw a square that is also a circle",
+    "response": "",
+    "elements": [],
+    "durationMs": 0,
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable."
+  }
+]

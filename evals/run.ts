@@ -5,11 +5,15 @@ import { generateText, stepCountIs } from 'ai'
 import { createOpenAI } from "@ai-sdk/openai";
 import { tools } from '../src/tools'
 import { SYSTEM_PROMPT } from '../src/system-prompts'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 
 const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! })
 const start = Date.now()
 
-
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const ROOT =join(__dirname, '..')
 async function RunTestCase(testCase: TestCase) :Promise<EvalResult> {
 
     try{
@@ -56,3 +60,45 @@ async function RunTestCase(testCase: TestCase) :Promise<EvalResult> {
     }
 
 }
+
+async function main() {
+    const datasetPath = join(ROOT, 'evals/datasets/golden.json')
+    const testCases = JSON.parse(readFileSync(datasetPath, 'utf-8'))
+
+    console.log(`Running ${testCases.length} test case${testCases.length !== 1 ? 's' : ''}...\n`)
+
+    const results: EvalResult[] = []
+    for (const testCase of testCases) {
+        process.stdout.write(`[${testCase.id}] ${testCase.difficulty.padEnd(6)} `)
+        const result = await RunTestCase(testCase)
+        results.push(result)
+        if (result.error) {
+            console.log(`ERROR: ${result.error}`)
+        } else {
+            console.log(`${result.elements.length} elements, ${result.durationMs}ms`)
+        }
+    }
+
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const resultsDir = join(ROOT, 'evals/results')
+    mkdirSync(resultsDir, { recursive: true })
+    const resultsFile = join(resultsDir, `results-${timestamp}.json`)
+    
+    writeFileSync(resultsFile, JSON.stringify(results, null, 2))
+    console.log(`\n✓ Results saved to ${resultsFile}`)
+
+    
+    const successful = results.filter(r => !r.error).length
+    const failed = results.filter(r => r.error).length
+    const totalElements = results.reduce((sum, r) => sum + r.elements.length, 0)
+    const avgDuration = results.filter(r => !r.error).reduce((sum, r) => sum + r.durationMs, 0) / successful
+
+    console.log(`\nSummary:`)
+    console.log(`  Passed: ${successful}/${results.length}`)
+    console.log(`  Failed: ${failed}`)
+    console.log(`  Total elements generated: ${totalElements}`)
+    console.log(`  Avg duration: ${Math.round(avgDuration)}ms`)
+}
+
+main().catch(console.error)

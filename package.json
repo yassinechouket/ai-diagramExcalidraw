@@ -9,13 +9,15 @@
     "preview": "vite preview",
     "docs": "vitepress dev lessons",
     "docs:build": "vitepress build lessons",
-    "agent": "node scripts/test-agent.mjs"
+    "agent": "node scripts/test-agent.mjs",
+    "evals": "dotenv tsx evals/run.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.53",
     "@cloudflare/ai-chat": "^0.4.4",
     "@excalidraw/excalidraw": "^0.18.0",
     "ai": "^6.0.167",
+    "dotenv-cli": "^11.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zod": "^4.3.6"
