@@ -1,6 +1,11 @@
-import { streamText,generateText,stepCountIs } from 'ai';
-
-import {tools} from './tools'
+import {
+  generateText,
+  streamText,
+  stepCountIs,
+  type LanguageModel,
+  type ModelMessage,
+} from "ai";
+import { tools } from "./tools";
 
 
 
@@ -23,57 +28,37 @@ When the user asks to modify an element, use the modifyDiagram tool with the ele
 
 
 
-export function streamAgent({model,messages,system=SYSTEM_PROMPT,maxSteps=5}){
-    return streamAgent({
-    model,
-    system,
-    messages,
-    tools,
-    stopWhen: stepCountIs(maxSteps)
-    })
+interface AgentArgs {
+  model: LanguageModel;
+  messages: ModelMessage[];
+  system?: string;
+  maxSteps?: number;
 }
 
 
+export function streamAgent({ model, messages, system = SYSTEM_PROMPT, maxSteps = 5 }: AgentArgs) {
+  return streamText({ model, system, messages, tools, stopWhen: stepCountIs(maxSteps) });
+}
 
 
-export async function runAgent({model,messages,system=SYSTEM_PROMPT,maxSteps=5}){
-    const result = await generateText({
-        model,
-        system,
-        messages,
-        tools,
-        stopWhen: stepCountIs(maxSteps)
-    })
+export async function runAgent({ model, messages, system = SYSTEM_PROMPT, maxSteps = 5 }: AgentArgs) {
+  const result = await generateText({ model, system, messages, tools, stopWhen: stepCountIs(maxSteps) });
+  return { text: result.text, elements: extractElements(result.steps), steps: result.steps };
+}
 
-    return {
-        text: result.text,
-        steps: result.steps,
-        elements: extarctElemets(result.steps)
+interface StepLike {
+  toolResults?: { toolName: string; output: unknown }[];
+}
+
+export function extractElements(steps: StepLike[]): unknown[] {
+  const elements: unknown[] = [];
+  for (const step of steps) {
+    for (const toolResult of step.toolResults ?? []) {
+      if (toolResult.toolName === "generateDiagram") {
+        const output = toolResult.output as { elements?: unknown[] };
+        if (Array.isArray(output?.elements)) elements.push(...output.elements);
+      }
     }
+  }
+  return elements;
 }
-
-interface StepLike{
-    toolResults?:{
-        toolName: string;
-        output: unknown;
-    }[]
-
-}
-
-
-export function extarctElemets(steps:StepLike[]): unknown[]{
-    const elements :unknown[]=[] ;
-    for(const step of steps){
-        for(const tollResult of step.toolResults ?? []){
-            if (tollResult.toolName === "generateDiagram"){
-                const output= tollResult.output as any
-                if(Array.isArray(output?.elements)){
-                    elements.push(...output.elements)
-                }
-            }
-        }
-    }
-    return elements;
-}
-
-

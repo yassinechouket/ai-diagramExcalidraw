@@ -59,7 +59,7 @@ export default function App() {
     },
   });
 
-  // Watch messages for mutating server tools and apply them to the
+  // Watch messages for the three mutating server tools and apply them to the
   // live canvas. The worker side just relays intent — actual scene mutation
   // is the browser's job, since only the browser owns the Excalidraw store.
   useEffect(() => {
@@ -71,9 +71,7 @@ export default function App() {
         const type = (part as { type?: string }).type;
         if (
           type !== "tool-addElements" &&
-          type !== "tool-generateDiagram" &&
           type !== "tool-updateElements" &&
-          type !== "tool-modifyDiagram" &&
           type !== "tool-removeElements"
         ) {
           continue;
@@ -88,7 +86,7 @@ export default function App() {
         if (appliedToolCalls.current.has(p.toolCallId)) continue;
         appliedToolCalls.current.add(p.toolCallId);
 
-        if (p.type === "tool-addElements" || p.type === "tool-generateDiagram") {
+        if (p.type === "tool-addElements") {
           const output = p.output as { elements?: unknown };
           const skeletons = output?.elements;
           if (Array.isArray(skeletons) && skeletons.length > 0) {
@@ -106,25 +104,11 @@ export default function App() {
             });
             excalidrawAPI.scrollToContent(next, { fitToContent: true });
           }
-        } else if (p.type === "tool-updateElements" || p.type === "tool-modifyDiagram") {
+        } else if (p.type === "tool-updateElements") {
           const output = p.output as {
-            updates?:
-              | { id: string; fields: Record<string, unknown> }[]
-              | Record<string, unknown>;
-            elementId?: string;
+            updates?: { id: string; fields: Record<string, unknown> }[];
           };
-
-          let updates: { id: string; fields: Record<string, unknown> }[] = [];
-          if (Array.isArray(output?.updates)) {
-            updates = output.updates;
-          } else if (
-            typeof output?.elementId === "string" &&
-            output?.updates &&
-            !Array.isArray(output.updates)
-          ) {
-            updates = [{ id: output.elementId, fields: output.updates }];
-          }
-
+          const updates = output?.updates;
           if (Array.isArray(updates) && updates.length > 0) {
             const byId = new Map(updates.map((u) => [u.id, u.fields]));
             const current = excalidrawAPI.getSceneElements();
@@ -163,7 +147,7 @@ export default function App() {
         sendMessage={sendMessage}
         status={status}
       />
-      <a href="#viewer" className="viewer-launch" title="Open diagram viewer for human scoring">
+      <a href="/viewer" className="viewer-launch" title="Open diagram viewer for human scoring">
         viewer
       </a>
     </div>

@@ -1,23 +1,21 @@
 import type { ModelMessage } from "ai";
 
-interface Seed {
+export interface SeedData {
   userPrompt: string;
-  elements: unknown[];
   assistantConfirmation: string;
+  elements: unknown[];
 }
 
-interface GoldenTestCase {
+export interface GoldenTestCase {
   id: string;
   input: string;
-  seed?: Seed;
+  seed?: SeedData;
+  expectedCharacteristics: string[];
+  expectedKeywords?: string[];
+  preservedIds?: string[];
+  difficulty: "simple" | "medium" | "hard" | "edge";
+  category: "create" | "modify" | "domain" | "edge";
 }
-
-
-export type Difficulty = "simple" | "medium" | "hard" | "edge";
-export type Category = "create" | "modify" | "domain" | "edge";
-
-
-
 
 export function buildMessages(tc: GoldenTestCase): ModelMessage[] {
   if (!tc.seed) {
@@ -25,13 +23,8 @@ export function buildMessages(tc: GoldenTestCase): ModelMessage[] {
   }
 
   const callId = `seed_${tc.id}`;
-
   return [
-    {
-      role: "user",
-      content: tc.seed.userPrompt,
-    },
-
+    { role: "user", content: tc.seed.userPrompt },
     {
       role: "assistant",
       content: [
@@ -43,7 +36,6 @@ export function buildMessages(tc: GoldenTestCase): ModelMessage[] {
         },
       ],
     },
-
     {
       role: "tool",
       content: [
@@ -51,24 +43,11 @@ export function buildMessages(tc: GoldenTestCase): ModelMessage[] {
           type: "tool-result",
           toolCallId: callId,
           toolName: "generateDiagram",
-          output: {
-            type: "json",
-            value: {
-              elements: tc.seed.elements as never,
-            },
-          },
+          output: { type: "json", value: { elements: tc.seed.elements as never } },
         },
       ],
     },
-
-    {
-      role: "assistant",
-      content: tc.seed.assistantConfirmation,
-    },
-
-    {
-      role: "user",
-      content: tc.input,
-    },
+    { role: "assistant", content: tc.seed.assistantConfirmation },
+    { role: "user", content: tc.input },
   ];
 }

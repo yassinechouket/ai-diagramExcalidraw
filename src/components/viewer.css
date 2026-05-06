@@ -1,0 +1,174 @@
+.viewer-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.viewer-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+.viewer-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.viewer-link {
+  color: #111;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.viewer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viewer-title {
+  font-weight: 700;
+}
+
+.viewer-subtitle {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.viewer-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.viewer-file input {
+  display: none;
+}
+
+.viewer-file,
+.viewer-btn {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.viewer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.viewer-error {
+  padding: 10px 12px;
+  background: #fff3f3;
+  border-bottom: 1px solid rgba(255, 0, 0, 0.15);
+  color: #7a0010;
+}
+
+.viewer-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.viewer-canvas {
+  flex: 1;
+  min-width: 0;
+}
+
+.viewer-panel {
+  width: 420px;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  padding: 12px;
+  overflow: auto;
+}
+
+.viewer-panel-section {
+  margin-bottom: 14px;
+}
+
+.viewer-section-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.viewer-kv {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.viewer-k {
+  width: 90px;
+  opacity: 0.7;
+}
+
+.viewer-v {
+  flex: 1;
+  word-break: break-word;
+}
+
+.viewer-error-text {
+  color: #7a0010;
+}
+
+.viewer-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.viewer-score-row {
+  display: flex;
+  gap: 8px;
+}
+
+.viewer-score {
+  width: 40px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.viewer-score.is-active {
+  background: #111;
+  color: #fff;
+}
+
+.viewer-notes {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font: inherit;
+  font-size: 12px;
+}
+
+.viewer-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.viewer-empty {
+  font-size: 13px;
+  opacity: 0.75;
+}
